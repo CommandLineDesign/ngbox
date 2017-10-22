@@ -5,6 +5,7 @@ import { NgBoxService } from './ngbox.service';
 @Component({
     selector: 'my-ngbox, ngbox',
     template: `
+    <div id="ngBoxOverlay" *ngIf="ngBox.open"></div>
         <div id="ngBoxLoading" *ngIf="ngBox.loading"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNv
 ZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cD
 ovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjAiIHdpZHRo
@@ -26,79 +27,34 @@ OzExMyAwOzEyNS41IDA7MTM4LjUgMDsxNTEuNSAwOzE2NC41IDA7MTc4IDAiIGNhbGNNb2RlPSJkaXNj
 91bnQ9ImluZGVmaW5pdGUiLz48L2c+PC9zdmc+Cg=="/></div>
         <div id="ngBoxWrapper" (click)="closeOutside($event)" *ngIf="ngBox.open" [ngStyle]="{'padding-top': offsetHeight+'px'}">
             <div id="ngBoxContent">
-                <img *ngIf="getHasGroup()" class="left" (click)="previousNgBox()" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvb
-j0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNS4xLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyB
-WZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL
-0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDA
-wL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iNzBweCIgaGVpZ2h0PSIxMDBwe
-CIgdmlld0JveD0iMCAwIDcwIDEwMCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgNzAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxwb2x5Z29uIGZpbGw
-9IiNGRkZGRkYiIHN0cm9rZT0iIzZCNkI2QiIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBwb2ludHM9IjQ1LjYsOTguNTI0IDE0LjU0NCw1MCA0NS42LDEuNDc2IDQ4L
-jgwMSwzLjUyNCAxOS4wNTYsNTAgDQoJNDguODAxLDk2LjQ3NiAiLz4NCjwvc3ZnPg0K">
-                <img *ngIf="getHasGroup()" class="right" (click)="nextNgBox()" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0i
-MS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNS4xLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZX
-JzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dy
-YXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3
-N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iNzBweCIgaGVpZ2h0PSIxMDBweCIg
-dmlld0JveD0iMCAwIDcwIDEwMCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgNzAgMTAwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxwb2x5Z29uIGZpbGw9Ii
-NGRkZGRkYiIHN0cm9rZT0iIzZCNkI2QiIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBwb2ludHM9IjE3Ljc0Niw5OC41MjQgNDguODAxLDUwIDE3Ljc0NiwxLjQ3NiAx
-NC41NDUsMy41MjQgDQoJNDQuMjg5LDUwIDE0LjU0NSw5Ni40NzYgIi8+DQo8L3N2Zz4NCg==">
-                <img *ngIf="ngBox.current.type == 1"
-                     (load)="isLoaded()" 
-                     #ngBoxContent 
+                <img *ngIf="getHasGroup()" class="left" (click)="previousNgBox()" src="/public/icons/left@2x.png">
+                <img *ngIf="getHasGroup()" class="right" (click)="nextNgBox()" src="/public/icons/right@2x.png">
+                <img id="ngBoxImage" *ngIf="ngBox.current.type == 1"
+                     (load)="isLoaded()"
+                     #ngBoxContent
                      [src]="ngBox.current.url"
-                     [hidden]="ngBox.loading" 
+                     [hidden]="ngBox.loading"
                      (click)="nextNgBox()"
                      alt="">
-                <iframe *ngIf="ngBox.current.type == 2" 
-                        #ngBoxContent
-                        [src]="ngBox.current.url"
-                        width="{{ngBox.current.width}}"
-                        height="{{ngBox.current.height}}"
-                        frameborder="0"
-                        allowfullscreen>
-                </iframe>
-                <iframe *ngIf="ngBox.current.type == 3" 
-                        [src]="ngBox.current.url"
-                        #ngBoxContent
-                        width="{{ngBox.current.width}}"
-                        height="{{ngBox.current.height}}"
-                        frameborder="0" 
-                        webkitallowfullscreen 
-                        mozallowfullscreen 
-                        allowfullscreen>
-                </iframe>
-                <iframe *ngIf="ngBox.current.type == 4" 
-                        #ngBoxContent
-                        [src]="ngBox.current.url"
-                        frameborder="0"
-                        width="{{ngBox.current.width}}"
-                        height="{{ngBox.current.height}}"
-                        allowfullscreen>
-                </iframe>
+            <p id="ngBoxPages">
+                <span class="pages" *ngIf="getHasGroup()">{{getCurrentIndex()}} / {{getCount()}}</span>
+            </p>
             </div>
             <div #ngBoxButtons id="buttons" [hidden]="ngBox.loading">
-                <p>
-                    <span class="title" *ngIf="ngBox.current.title">{{ngBox.current.title}}<br/></span>
-                    <span class="pages" *ngIf="getHasGroup()">{{getCurrentIndex()}} of {{getCount()}}</span>
-                </p>
-                <img (click)="closeNgBox()" id="closeButton" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZG
-luZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNS4xLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAw
-IEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy
-8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6
-eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iMzBweCIgaGVpZ2h0PSIzMHB4IiB2aWV3Qm94PSIwID
-AgMzAgMzAiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDMwIDMwIiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxwb2x5Z29uIGZpbGw9IiNGRkZGRkYiIHN0cm9r
-ZT0iIzZCNkI2QiIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBwb2ludHM9IjI4LjUsMi44NCAyNS40NjMsMS41IDE1LDEyLjc0OSA0LjUzOSwxLjUgMS41LDIuODQgDQ
-oJMTIuODExLDE1IDEuNSwyNy4xNiA0LjUzOSwyOC41IDE1LDE3LjI1MSAyNS40NjMsMjguNSAyOC41LDI3LjE2IDE3LjE4OSwxNSAiLz4NCjwvc3ZnPg0K" alt="">
+                <img (click)="closeNgBox()" id="closeButton" src="/public/icons/close@2x.png" alt="">
             </div>
-
-
-            
-            
-            
 
         </div>
     `,
     styles: [`
+
+        #ngBoxOverlay{
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            background-color: black;
+            opacity: 0.6
+        }
         #ngBoxLoading{
             text-align: center;
             z-index: 10001;
@@ -109,27 +65,39 @@ oJMTIuODExLDE1IDEuNSwyNy4xNiA0LjUzOSwyOC41IDE1LDE3LjI1MSAyNS40NjMsMjguNSAyOC41LD
             top: 46%;
             font-size: 20px;
         }
+        #ngBoxImage {
+            max-height: 500px;
+            max-width: 666px;
+        }
         #ngBoxWrapper {
-            background-color: rgba(0, 0, 0, 0.9);
-            position: fixed;
-            top: 0px;
-            left: 0px;
+            display: inline-block;
             text-align: center;
             z-index: 10000;
-            width: 100%;
+            position: fixed;
             height: 100%;
+            width: 100%;
         }
-
-        #ngBoxWrapper #ngBoxContent img {
-            -webkit-border-radius: 4px;
-            -moz-border-radius: 4px;
-            border-radius: 4px;
+        #ngBoxPages{
+            display: inline-block;
+            vertical-align: top;
+            color: white;
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            font-size: 14px;
+            line-height: 17px;
         }
-
         #ngBoxContent {
+            position: fixed;
             display: block;
+            background-color: black;
+            top: 50%;
+            left: 50%;
+            height: 500px;
+            width: 840px;
+            margin-top: -250px;
+            margin-left: -420px;
         }
-
         button {
             font-size: 12px;
         }
@@ -158,24 +126,98 @@ oJMTIuODExLDE1IDEuNSwyNy4xNiA0LjUzOSwyOC41IDE1LDE3LjI1MSAyNS40NjMsMjguNSAyOC41LD
         }
         #closeButton{
             position: absolute;
-            top: 0px;
-            right: 0px;
+            top: 50px;
+            right: 50px;
+            height: 26px;
+            width: 26px;
             cursor: pointer;
         }
         .left{
-            position: fixed;
-            left: -5px;
-            margin-top: -42px;
+            position: absolute;
+            left: -75px;
+            margin-top: -19px;
             cursor: pointer;
             top: 50%;
+            height: 38px;
+            width: 24px;
         }
         .right{
-            position: fixed;
-            right: -10px;
-            margin-top: -42px;
+            position: absolute;
+            right: -75px;
+            margin-top: -19px;
             cursor: pointer;
             top: 50%;
+            height: 38px;
+            width: 24px;
         }
+
+       @media screen and (max-width: 1024px) {
+          .left{
+            left: 10px; !important
+          }
+          .right{
+            right: 10px; !important
+          }
+          #ngBoxContent{
+                background-color: black;
+                height: 80%;
+                position: absolute;
+                top: 10%;
+                left: 0;
+                width: 100%;
+                display: table-cell;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 0px;
+                margin-left: 0px;
+            }
+
+            #ngBoxImage{
+                max-height: 100%;
+                max-width: 100%;
+            }
+
+            #ngBoxWrapper {
+                display: flex;
+                z-index: 10000;
+                position: absolute;
+                height: 100%;
+                width: 100%;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+
+            .left {
+                position: absolute;
+                left: 10px !important;
+                /* margin-top: -19px; */
+                cursor: pointer;
+                top: 50%;
+                height: 38px;
+                width: 24px;
+            }
+            .right {
+                position: absolute;
+                right: 10px !important;
+                margin-top: -19px;
+                cursor: pointer;
+                top: 50%;
+                height: 38px;
+                width: 24px;
+            }
+            #closeButton{
+                position: fixed;
+                top: 24px;
+                right: 15px;
+                height: 15px;
+                width: 15px;
+                cursor: pointer;
+            }
+
+        }
+
     `]
 })
 export class NgBoxComponent implements DoCheck {
@@ -207,7 +249,6 @@ export class NgBoxComponent implements DoCheck {
     checkInterval() {
         let t = setInterval(() => {
             if (this.elementView && this.elementButtons  ) {
-                this.resize();
                 // Stop Loading on frames
                 if (this.ngBox.current.type === 2 || this.ngBox.current.type === 3 || this.ngBox.current.type === 4) {
                     this.ngBox.loading = false;
@@ -228,40 +269,6 @@ export class NgBoxComponent implements DoCheck {
         }
         return false;
     }
-
-    @HostListener('window:resize', ['$event'])
-    resize() {
-        // Resize big images
-
-        if ( this.elementView && this.elementButtons) {
-            let currentWidth = this.calcPercent(this.ngBox.current.width, window.innerWidth);
-            let currentHeight = this.calcPercent(this.ngBox.current.height, window.innerHeight);
-
-            let realWidth   = this.elementView.nativeElement.naturalWidth ?
-                              this.elementView.nativeElement.naturalWidth : currentWidth;
-            let realHeight  = this.elementView.nativeElement.naturalHeight ?
-                              this.elementView.nativeElement.naturalHeight : currentHeight;
-
-
-            let maxWidth    = Math.min((window.innerWidth - 70), currentWidth ? currentWidth : realWidth);
-            let maxHeight   = Math.min((window.innerHeight - 60), currentHeight ? currentHeight : realHeight);
-
-            let ratio       = Math.min( maxWidth / realWidth, maxHeight / realHeight);
-
-            this.elementView.nativeElement.width    = realWidth * ratio;
-            this.elementView.nativeElement.height   = realHeight * ratio;
-
-
-            this.elementButtons.nativeElement.style.width = this.elementView.nativeElement.offsetWidth + 'px';
-
-            // Calculate top padding
-            this.offsetHeight = (window.innerHeight - 40 - this.elementView.nativeElement.offsetHeight) / 2;
-            if (this.offsetHeight < 0) {
-                this.offsetHeight = 0;
-            }
-        }
-    }
-
 
 
 
