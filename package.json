@@ -1,6 +1,6 @@
 {
-  "name": "ng-box",
-  "version": "0.0.0",
+  "name": "cld-ng-box",
+  "version": "0.0.3",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -10,7 +10,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@angular/common": "^4.0.0",
     "@angular/compiler": "^4.0.0",
@@ -21,7 +21,7 @@
     "@angular/platform-browser-dynamic": "^4.0.0",
     "@angular/router": "^4.0.0",
     "core-js": "^2.4.1",
-    "google-fonts-webpack-plugin": "^0.4.3",
+    "cld-ng-box": "0.0.3",
     "rxjs": "^5.1.0",
     "zone.js": "^0.8.4"
   },
@@ -36,9 +36,9 @@
     "karma": "~1.4.1",
     "karma-chrome-launcher": "~2.0.0",
     "karma-cli": "~1.0.1",
-    "karma-coverage-istanbul-reporter": "^0.2.0",
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
+    "karma-coverage-istanbul-reporter": "^0.2.0",
     "protractor": "~5.1.0",
     "ts-node": "~2.0.0",
     "tslint": "~4.5.0",
